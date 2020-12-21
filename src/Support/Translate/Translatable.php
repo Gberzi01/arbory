@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Support\Arr;
 
 trait Translatable
 {
@@ -159,7 +160,7 @@ trait Translatable
      */
     public function getAttribute( $key )
     {
-        list( $attribute, $locale ) = $this->getAttributeAndLocale( $key );
+        [ $attribute, $locale ] = $this->getAttributeAndLocale( $key );
 
         if( $this->isTranslatableAttribute( $attribute ) )
         {
@@ -192,7 +193,7 @@ trait Translatable
      */
     public function setAttribute( $key, $value )
     {
-        list( $attribute, $locale ) = $this->getAttributeAndLocale( $key );
+        [ $attribute, $locale ] = $this->getAttributeAndLocale( $key );
 
         if( $this->isTranslatableAttribute( $attribute ) )
         {
@@ -282,7 +283,7 @@ trait Translatable
             }
             else
             {
-                list( $attribute, $locale ) = $this->getAttributeAndLocale( $key );
+                [ $attribute, $locale ] = $this->getAttributeAndLocale( $key );
                 if( $this->isTranslatableAttribute( $attribute ) )
                 {
                     $this->getTranslationOrNew( $locale )->fill( [ $attribute => $values ] );
@@ -345,7 +346,7 @@ trait Translatable
     {
         $parts = explode( $this->getLocaleSeparator(), $locale );
 
-        return array_get( $parts, 0 );
+        return Arr::get( $parts, 0 );
     }
 
     /**
@@ -393,7 +394,7 @@ trait Translatable
 
         if( empty( $localesConfig ) )
         {
-            throw new \ErrorException( 'Please make sure you have run "php artisan config:publish dimsav/laravel-translatable" ' .
+            throw new \ErrorException( 'Please make sure you have run "php artisan vendor:publish --tag=translatable" ' .
                 ' and that the locales configuration is defined.' );
         }
 

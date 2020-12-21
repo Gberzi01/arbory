@@ -16,6 +16,7 @@ use Arbory\Base\Admin\Exports\DataSetExport;
 use Arbory\Base\Admin\Exports\ExportInterface;
 use Arbory\Base\Admin\Exports\Type\ExcelExport;
 use Arbory\Base\Admin\Exports\Type\JsonExport;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 trait Crudify
@@ -108,7 +109,7 @@ trait Crudify
             $layout->body($this->buildGrid($this->resource()));
         });
 
-        $layout->bodyClass('controller-' . str_slug($this->module()->name()) . ' view-index');
+        $layout->bodyClass('controller-' . Str::slug($this->module()->name()) . ' view-index');
 
         return $layout;
     }
@@ -119,7 +120,7 @@ trait Crudify
      */
     public function show($resourceId)
     {
-        return redirect($this->module()->url('edit', $resourceId));
+        return redirect($this->module()->url('edit', $resourceId, false));
     }
 
     /**
@@ -131,7 +132,7 @@ trait Crudify
             $layout->body($this->buildForm($this->resource()));
         });
 
-        $layout->bodyClass('controller-' . str_slug($this->module()->name()) . ' view-edit');
+        $layout->bodyClass('controller-' . Str::slug($this->module()->name()) . ' view-edit');
 
         return $layout;
     }
@@ -169,7 +170,7 @@ trait Crudify
             $layout->body($this->buildForm($resource));
         });
 
-        $layout->bodyClass('controller-' . str_slug($this->module()->name()) . ' view-edit');
+        $layout->bodyClass('controller-' . Str::slug($this->module()->name()) . ' view-edit');
 
         return $layout;
     }
@@ -207,7 +208,7 @@ trait Crudify
 
         $this->buildForm($resource)->destroy();
 
-        return redirect($this->module()->url('index'));
+        return redirect($this->module()->url('index', [], false));
     }
 
     /**
@@ -217,7 +218,7 @@ trait Crudify
      */
     public function dialog(Request $request, string $name)
     {
-        $method = camel_case($name) . 'Dialog';
+        $method = Str::camel($name) . 'Dialog';
 
         if (!$name || !method_exists($this, $method)) {
             app()->abort(Response::HTTP_NOT_FOUND);
@@ -285,9 +286,9 @@ trait Crudify
     {
         $model = $tools->model();
 
-        $tools->add('edit', $this->url('edit', $model->getKey()));
+        $tools->add('edit', $this->url('edit', $model->getKey(), false));
         $tools->add('delete',
-            $this->url('dialog', ['dialog' => 'confirm_delete', 'id' => $model->getKey()])
+            $this->url('dialog', ['dialog' => 'confirm_delete', 'id' => $model->getKey()], false)
         )->dialog()->danger();
     }
 
@@ -301,8 +302,8 @@ trait Crudify
         $model = $this->resource()->find($resourceId);
 
         return view('arbory::dialogs.confirm_delete', [
-            'form_target' => $this->url('destroy', [$resourceId]),
-            'list_url' => $this->url('index'),
+            'form_target' => $this->url('destroy', [$resourceId], false),
+            'list_url' => $this->url('index', [], false),
             'object_name' => (string)$model,
         ]);
     }
@@ -314,7 +315,7 @@ trait Crudify
      */
     public function api(Request $request, string $name)
     {
-        $method = camel_case($name) . 'Api';
+        $method = Str::camel($name) . 'Api';
 
         if (!$name || !method_exists($this, $method)) {
             app()->abort(Response::HTTP_NOT_FOUND);
@@ -328,11 +329,12 @@ trait Crudify
     /**
      * @param string $route
      * @param array $parameters
+     * @param bool $absolute
      * @return string
      */
-    public function url(string $route, $parameters = [])
+    public function url(string $route, $parameters = [], $absolute = true)
     {
-        return $this->module()->url($route, $parameters);
+        return $this->module()->url($route, $parameters, $absolute);
     }
 
     /**
@@ -363,7 +365,7 @@ trait Crudify
     public function slugGeneratorApi(Request $request)
     {
         /** @var \Illuminate\Database\Query\Builder $query */
-        $slug = str_slug($request->input('from'));
+        $slug = Str::slug($request->input('from'));
         $column = $request->input('column_name');
 
         $query = \DB::table($request->input('model_table'))->where($column, $slug);
@@ -389,6 +391,6 @@ trait Crudify
      */
     protected function getAfterEditResponse(Request $request)
     {
-        return redirect($request->has('save_and_return') ? $this->module()->url('index') : $request->url());
+        return redirect($request->has('save_and_return') ? $this->module()->url('index', [],false) : $request->url());
     }
 }

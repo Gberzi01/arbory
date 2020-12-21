@@ -24,7 +24,7 @@ export default class AdminPanel {
      * @return {void}
      */
     initialize() {
-        CKEDITOR.basePath = '/arbory/ckeditor/';
+        CKEDITOR.basePath = '/' + [window.APP_URI_PREFIX, 'arbory/ckeditor/'].filter(String).join('/');
 
         CKEDITOR.on('instanceReady', function(e) {
             jQuery(e.editor.element.$).addClass("ckeditor-initialized");
@@ -39,7 +39,7 @@ export default class AdminPanel {
     registerEventHandlers() {
         let body = jQuery('body');
 
-        body.on('nestedfieldsitemadd', 'section.nested', event => {
+        body.on('nestedfieldsitemadd', 'section.nested .new', event => {
             this.initializeFields(event.target);
         });
 
@@ -52,10 +52,10 @@ export default class AdminPanel {
      * @return {void}
      */
     initializeFields(scope) {
-        for (let [_, definition] of Object.entries(this.registry.definitions)) {
+        jQuery.each(this.registry.definitions, function(_, definition) {
             jQuery(scope).find(definition.selector).each((key, element) => {
                 new definition.handler(element, definition.config);
             });
-        }
+        });
     }
 }

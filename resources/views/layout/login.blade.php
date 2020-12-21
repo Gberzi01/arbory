@@ -3,8 +3,8 @@
 <head>
     <title>Arbory</title>
     <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
-    <link href="{{ mix('/css/application.css', 'arbory') }}" media="all" rel="stylesheet"/>
-    <link href="{{ mix('/css/controllers/sessions.css', 'arbory') }}" media="all" rel="stylesheet"/>
+    <link href="{{ asset(mix('/css/application.css', 'arbory')) }}" media="all" rel="stylesheet"/>
+    <link href="{{ asset(mix('/css/controllers/sessions.css', 'arbory')) }}" media="all" rel="stylesheet"/>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
 </head>
 <body class="controller-arbory-sessions view-edit">
@@ -29,7 +29,7 @@
     <div class="box">
         <div class="logo"></div>
 
-        <form class="login" action="{{route('admin.login.attempt')}}" accept-charset="UTF-8" method="post">
+        <form class="login" action="{{route('admin.login.attempt', [], false)}}" accept-charset="UTF-8" method="post">
             {!!csrf_field()!!}
             <div class="field @if($errors->has('user.email'))has-error @endif">
                 <label for="email">Email</label>
@@ -52,6 +52,6 @@
         </form>
     </div>
 </div>
-<script src="{{ mix('/js/application.js','arbory') }}"></script>
+<script src="{{ asset(mix('/js/application.js','arbory')) }}"></script>
 </body>
 </html>

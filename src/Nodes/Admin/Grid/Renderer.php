@@ -12,6 +12,7 @@ use Arbory\Base\Html\Elements\Element;
 use Arbory\Base\Html\Html;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
 /**
@@ -75,7 +76,7 @@ class Renderer implements Renderable
      */
     protected function buildTree( Collection $items, $level = 1 )
     {
-        $url = $this->url( 'edit', '__ID__' );
+        $url = $this->url( 'edit', '__ID__', false );
 
         $list = Html::ul()->addAttributes( [ 'data-level' => $level ] );
 
@@ -106,7 +107,7 @@ class Renderer implements Renderable
             }
 
             $li->append(
-                Toolbox::create( $this->url( 'dialog', [ 'dialog' => 'toolbox', 'id' => $item->getKey() ] ) )->render()
+                Toolbox::create( $this->url( 'dialog', [ 'dialog' => 'toolbox', 'id' => $item->getKey() ], false ) )->render()
             );
 
             if( $hasChildren )
@@ -146,7 +147,7 @@ class Renderer implements Renderable
      */
     protected function footer()
     {
-        $createButton = Link::create( $this->url( 'dialog', 'content_types' ) )
+        $createButton = Link::create( $this->url( 'dialog', 'content_types', false ) )
             ->asButton( 'primary ajaxbox' )
             ->withIcon( 'plus' )
             ->title( trans( 'arbory::resources.create_new' ) );
@@ -164,11 +165,12 @@ class Renderer implements Renderable
     /**
      * @param $route
      * @param array $parameters
+     * @param bool $absolute
      * @return string
      */
-    public function url( $route, $parameters = [] )
+    public function url( $route, $parameters = [], $absolute = true )
     {
-        return $this->grid()->getModule()->url( $route, $parameters );
+        return $this->grid()->getModule()->url( $route, $parameters, $absolute );
     }
 
     /**
@@ -190,8 +192,8 @@ class Renderer implements Renderable
      */
     protected function getNodeCookie( $nodeId )
     {
-        $cookie = (array) json_decode( array_get( $_COOKIE, self::COOKIE_NAME_NODES ) );
+        $cookie = (array) json_decode( Arr::get( $_COOKIE, self::COOKIE_NAME_NODES ) );
 
-        return array_get( $cookie, $nodeId, true );
+        return Arr::get( $cookie, $nodeId, true );
     }
 }
